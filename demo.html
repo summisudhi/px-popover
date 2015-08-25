@@ -1,0 +1,71 @@
+<!doctype html>
+
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>px-popover Demo</title>
+        <!-- Requires Webcomponents.js polyfill is provided by the page for browsers that don't support html imports -->
+        <script src="../webcomponentsjs/webcomponents-lite.min.js"></script>
+        <!-- Import custom element. Note: see comment about relative paths to dependencies in the *.html file referenced below -->
+        <link rel="import" href="px-popover.html"/>
+        <style media="screen">
+            .sample-container {
+                width: 250px;
+                margin-left: auto;
+                margin-right: auto;
+            }
+            .hover-popover {
+                padding: 15px;
+                width: 200px;
+                background-color: black;
+                color: white;
+                text-align: center;
+                vertical-align: middle;
+            }
+        </style>
+    </head>
+
+    <body>
+        <h3>PX-Popover Demo</h3>
+        <p>
+            Although related, examples are /not/ the same as the test fixtures.
+            Tests are tests, examples are examples.
+        </p>
+
+        <p>
+            Also see the <a href="index.html">documentation</a> and the <a href="test/fixture.html">UI test fixture</a>.
+        </p>
+
+        <p>
+            Click button to invoke popover:
+        </p>
+
+        <div class="sample-container">
+            <button id="btnAuto" type="button">Auto</button>
+            <px-popover for="btnAuto" interaction="click" orientation="auto" popover-title="Auto positioned" popover-body="This is a wonderful text popover, it's very useful when needed."></px-popover>
+
+            <button id="btnUp" type="button" name="button">Up</button>
+            <px-popover for="btnUp" interaction="click" orientation="top" popover-title="Top Popover" popover-body="Lorem ipsum dolor sit amet, consectetur elit, sed do eiusmod."></px-popover>
+
+            <button id="btnDown" type="button" name="button">Down</button>
+            <px-popover for="btnDown" interaction="click" orientation="bottom" popover-title="Bottom Popover" popover-body="Lorem ipsum dolor sit amet, consectetur elit, sed do eiusmod."></px-popover>
+
+            <button id="btnLeft" type="button" name="button">Left</button>
+            <px-popover for="btnLeft" interaction="click" orientation="left" popover-title="Left Popover" popover-body="Lorem ipsum dolor sit amet, consectetur elit, sed do eiusmod."></px-popover>
+
+            <button id="btnRight" type="button" name="button">Right</button>
+            <px-popover for="btnRight" interaction="click" orientation="right" popover-title="Right Popover" popover-body="Lorem ipsum dolor sit amet, consectetur elit, sed do eiusmod."></px-popover>
+        </div>
+        <p></p>
+        <div class="sample-container">
+            <input type="text" id="textInput" value="" placeholder="Focus for popover">
+            <px-popover for="textInput" interaction="focus" orientation="right" popover-title="Right Popover" popover-body="Lorem ipsum dolor sit amet, consectetur elit, sed do eiusmod."></px-popover>
+        </div>
+        <p></p>
+        <div class="sample-container">
+            <div id="hoverDiv" class="hover-popover">Hover for popover</div>
+            <px-popover for="hoverDiv" interaction="hover" orientation="bottom" popover-title="Bottom Popover" popover-body="Lorem ipsum dolor sit amet, consectetur elit, sed do eiusmod."></px-popover>
+        </div>
+    </body>
+</html>
