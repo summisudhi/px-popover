@@ -71,6 +71,7 @@ elements are not supported.
             }
         },
         _isShowing: false,
+        _mouseInside: false,
         /**
          * Properties block, expose attribute values to the DOM via 'reflect'
          *
@@ -147,15 +148,13 @@ elements are not supported.
         },
         attached: function () {
             this._target = this.target;
-            this.listen(document, 'click', '_close');
+            this.listen(document, 'click', '_toggle'); // we always listen to click so we can close when clicked outside
             if(this.interaction === this._values.INTERACTION.hover) {
                 this.listen(this._target, 'mouseenter', '_toggle');
                 this.listen(this._target, 'mouseleave', '_toggle');
             } else if (this.interaction === this._values.INTERACTION.focus) {
                 this.listen(this._target, 'focus', '_toggle');
                 this.listen(this._target, 'blur', '_toggle');
-            } else { // default to click
-                this.listen(document, 'click', '_toggle');
             }
         },
         detached: function () {
@@ -171,16 +170,54 @@ elements are not supported.
         _onIronResize: function () {
             this._setPosition();
         },
-        _toggle: function (event) {
-            if(event.target.id === this.for) {
-                event.stopPropagation();
-                if(this._isShowing) {
-                    this._hide();
-                } else {
-                    this._show();
+        _setMouseInside: function () {
+            this._mouseInside = true;
+        },
+        _isDescendant: function (parent, child) {
+        var node = child.parentNode;
+            while (node != null) {
+                if (node == parent) {
+                    return true;
                 }
-            } else {
-                this._hide();
+                node = node.parentNode;
+            }
+            return false;
+        },
+        _toggle: function (event) {
+
+            // hide the popover if a click is coming from the outside
+
+            if(event.type === this._values.INTERACTION.click) {
+                if( this._isDescendant(this, event.target) ) {
+                    console.log('is a decendant');
+                    return false;
+                } else {
+                    if(event.target.id === this.for) {
+                        if(this._isShowing) {
+                            this._hide();
+                        } else {
+                            this._show();
+                        }
+                        return false;
+                    } else { // not our target
+                        if(this._isShowing) {
+                            console.log('is NOT a decendant, and its showing so lets hide');
+                            this._hide();
+                            return false;
+                        }
+                    }
+                }
+            }
+
+            if (event.type === 'mouseenter' || event.type === 'mouseleave') {
+                if(event.target.id === this.for) {
+                    if(this._isShowing) {
+                        this._hide();
+                    } else {
+                        this._show();
+                    }
+                    return false;
+                }
             }
         },
         /**
@@ -194,9 +231,7 @@ elements are not supported.
             this._setPosition();
             this._isShowing = true;
             this.fire('px-popover-show', {
-                target: {
-                    id: this.target.id
-                }
+                target: this
             });
         },
         /**
@@ -208,25 +243,6 @@ elements are not supported.
             // hide this thing
             this.$.popoverWrapper.hidden = true;
             this._isShowing = false
-        },
-        /**
-         * Hide the popover if the user clicks outside
-         * of the popover
-         *
-         * @method _hide
-         */
-        _close: function (event) {
-            if (event.target.for !== this.for) {
-                this._hide();
-            }
-        },
-        /**
-         * Position the popover
-         *
-         * @method _autoPosition
-         */
-        _autoPosition: function () {
-            // listen to reszie event and auto position
         },
         _setPosition: function() {
             if (!this._target)
