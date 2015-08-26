@@ -68,7 +68,7 @@ Hover popover
 
 ### Layout
 
-The popover has a fixed width but will grow vertically relative to it's contents.
+The popover has a fixed width but will grow vertically relative to its contents.
 
 ### Latest Release
 - not released yet!

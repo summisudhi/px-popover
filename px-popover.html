@@ -189,7 +189,6 @@ elements are not supported.
 
             if(event.type === this._values.INTERACTION.click) {
                 if( this._isDescendant(this, event.target) ) {
-                    console.log('is a decendant');
                     return false;
                 } else {
                     if(event.target.id === this.for) {
@@ -201,7 +200,6 @@ elements are not supported.
                         return false;
                     } else { // not our target
                         if(this._isShowing) {
-                            console.log('is NOT a decendant, and its showing so lets hide');
                             this._hide();
                             return false;
                         }
