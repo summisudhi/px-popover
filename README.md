@@ -1,53 +1,73 @@
-Px-Popover
+Px-Slider
 -----------------------------------------------
 
 ## Overview
 
-Px-Popover is a Predix Experience ('Px') component
+The px-popover is a Predix Experience ('Px') component for displaying additional information to a user.
 
-## Getting Started
+### Attributes
 
-Read https://github.sw.ge.com/pages/PX/technical-principles/
+**for**
+The element to which the popover provides additional information.
 
-From the component's directory...
+**interaction**
+The event type that will invoke the popover. Currently supports 'click' or 'hover'.
 
+**orientation**
+The position of the popover relative to the 'for' element. Currently supports 'top', 'bottom', 'left' and 'right'.
+
+**popover-title**
+The title that will be displayed in the popover.
+
+**popover-body**
+The body text that will be displayed in the popover. Note: Does not support HTML elements within the body.
+
+### Examples
+
+Top popover
 ```
-$ npm install
-$ bower install
-$ grunt sass
+<div class="sample-container">
+    <button id="btnUp" type="button" name="button">Up</button>
+    <px-popover
+        for="btnUp"
+        interaction="click"
+        orientation="top"
+        popover-title="Top Popover"
+        popover-body="Lorem ipsum dolor sit amet, consectetur elit, sed do eiusmod.">
+    </px-popover>
+</div>
 ```
 
-### API and examples
-
-From the component's directory
-
+Bottom popover
 ```
-$ grunt depserve
+<div class="sample-container">
+    <button id="btnUp" type="button" name="button">Bottom</button>
+    <px-popover
+        for="btnUp"
+        interaction="click"
+        orientation="bottom"
+        popover-title="Bottom Popover"
+        popover-body="Lorem ipsum dolor sit amet, consectetur elit, sed do eiusmod.">
+    </px-popover>
+</div>
 ```
 
-Starts a local server. Navigate to the root of that server (e.g. http://localhost:8080/) in a browser to open the API documentation page, with link to the "Demo" / working examples.
+Hover popover
+```
+<div class="sample-container">
+    <div id="hoverDiv" class="hover-popover">Hover for popover</div>
+    <px-popover
+        for="hoverDiv"
+        interaction="hover"
+        orientation="bottom"
+        popover-title="Bottom Popover"
+        popover-body="Lorem ipsum dolor sit amet, consectetur elit, sed do eiusmod.">
+    </px-popover>
+</div>
+```
 
-### Options
+### Layout
 
-Does this component have runtime configuration options?  If so, they should be able to be passed as attributes on the element with examples shown below.
-
-### Function calls
-
-What is the public API of this component?
-
-### Extending styles
-
-Documented CSS extension points?
-
-### Extending behavior
-
-See Polymer composition patterns
-
-GE Coding Style Guide
----------------------
-
-[GE JS Developer's Guide](https://github.com/GeneralElectric/javascript)
-
+The popover has a fixed width but will grow vertically relative to it's contents.
 
 ### Known Issues
-
