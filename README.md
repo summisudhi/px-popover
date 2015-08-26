@@ -70,4 +70,11 @@ Hover popover
 
 The popover has a fixed width but will grow vertically relative to it's contents.
 
+### Latest Release
+- not released yet!
+
+### Active Development (master branch)
+- <a href="http://pxc-demos.grc-apps.svc.ice.ge.com/bower_components/px-popover/demo.html" target="_blank">Demo</a>
+- <a href="http://pxc-demos.grc-apps.svc.ice.ge.com/bower_components/px-popover/index.html" target="_blank">API Docs</a>
+
 ### Known Issues
