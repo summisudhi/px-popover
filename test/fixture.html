@@ -6,7 +6,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>px-popover Test Suite</title>
         <!-- Requires Webcomponents.js polyfill is provided by the page for browsers that don't support html imports -->
-        <script src="../webcomponentsjs/webcomponents-lite.min.js"></script>
+        <script src="../bower_components/webcomponentsjs/webcomponents.min.js"></script>
         <script src="../web-component-tester/browser.js"></script>
         <!-- Import custom element. Note: see comment about relative paths to dependencies in the *.html file referenced below -->
         <link rel="import" href="../px-popover.html"/>
@@ -115,6 +115,18 @@
                 test('reflects the "popover-body" property', function() {
                     assert.equal(testPopoverUp.popoverBody, "Lorem ipsum dolor sit amet, consectetur elit, sed do eiusmod.");
                 });
+
+                test('hides popover before click', function() {
+                    var wrapper = document.querySelectorAll('#testPopoverUp #popoverWrapper')[0];
+                    expect(wrapper.hidden).to.equal(true);
+                });
+
+                test('shows popover after click', function() {
+                    document.getElementById(testPopoverUp.for).click();
+                    var wrapper = document.querySelectorAll('#testPopoverUp #popoverWrapper')[0];
+                    expect(wrapper.hidden).to.equal(false);
+                });
+
             });
       </script>
     </body>
