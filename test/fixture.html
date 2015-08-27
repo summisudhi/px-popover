@@ -84,6 +84,7 @@
         <div class="sample-container">
             <div id="hoverDiv" class="hover-popover">Hover for popover</div>
             <px-popover
+                id="testPopoupHover"
                 for="hoverDiv"
                 interaction="hover"
                 orientation="bottom"
@@ -126,6 +127,18 @@
                     var wrapper = document.querySelectorAll('#testPopoverUp #popoverWrapper')[0];
                     expect(wrapper.hidden).to.equal(false);
                 });
+
+                test('popover closes again after click outside', function() {
+                    document.querySelector('.sample-container').click();
+                    var wrapper = document.querySelectorAll('#testPopoverUp #popoverWrapper')[0];
+                    expect(wrapper.hidden).to.equal(true);
+                });
+
+                // test('shows popup on hover', function() {
+                //     document.getElementById('hoverDiv').onmouseenter();
+                //     var wrapper = document.querySelectorAll('#testPopoupHover #popoverWrapper')[0];
+                //     expect(wrapper.hidden).to.equal(false);
+                // });
 
             });
       </script>
