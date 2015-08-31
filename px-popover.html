@@ -37,7 +37,7 @@ elements are not supported.
 <dom-module id="px-popover">
     <link rel="import" type="css" href="css/px-popover.css"/>
     <template>
-        <div id="popoverWrapper" class="visuallyhidden">
+        <div id="popoverWrapper" class="hidden">
             <div id="carat"></div>
             <div id="popover">
                 <p>{{popoverTitle}}</p>
@@ -225,7 +225,7 @@ elements are not supported.
          */
         _show: function () {
             // show this thing
-            this.$.popoverWrapper.classList.remove('visuallyhidden');
+            this.$.popoverWrapper.classList.remove('hidden')
             this._setPosition();
             this._isShowing = true;
             this.fire('px-popover-show', {
@@ -239,7 +239,7 @@ elements are not supported.
          */
         _hide: function () {
             // hide this thing
-            this.$.popoverWrapper.classList.add('visuallyhidden');
+            this.$.popoverWrapper.classList.add('hidden')
             this._isShowing = false
         },
         _setPosition: function() {

@@ -119,19 +119,19 @@
 
                 test('hides popover before click', function() {
                     var wrapper = document.querySelectorAll('#testPopoverUp #popoverWrapper')[0];
-                    expect(wrapper.classList.contains('visuallyhidden')).to.equal(true);
+                    expect(wrapper.hidden).to.equal(true);
                 });
 
                 test('shows popover after click', function() {
                     document.getElementById(testPopoverUp.for).click();
                     var wrapper = document.querySelectorAll('#testPopoverUp #popoverWrapper')[0];
-                    expect(wrapper.classList.contains('visuallyhidden')).to.equal(false);
+                    expect(wrapper.hidden).to.equal(false);
                 });
 
                 test('popover closes again after click outside', function() {
                     document.querySelector('.sample-container').click();
                     var wrapper = document.querySelectorAll('#testPopoverUp #popoverWrapper')[0];
-                    expect(wrapper.classList.contains('visuallyhidden')).to.equal(true);
+                    expect(wrapper.hidden).to.equal(true);
                 });
 
                 // test('shows popup on hover', function() {
