@@ -1,3 +1,3 @@
-v0.0.1
+v0.1.1
 ==================
-* Initial release
+* Added a 5 pixel margin between the element being hovered, and the popover.
