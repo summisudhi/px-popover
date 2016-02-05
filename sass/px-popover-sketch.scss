@@ -31,25 +31,51 @@ Predix branding rules go in px-popover-predix.scss, not in this file.
 @import "px-flexbox-design/_base.flexbox.scss";
 @import "px-viewport-design/_base.viewport.scss";
 
-$margin: 15px;
-$carat: 8px;
-$popover-color: $gray3;
+$margin: 5px;
+$carat: 7px;
+$popover-color: $white;
+$popover-border-color: $gray4;
 $popover-text-color: $black;
+$popover-shadow-color: rgba($black,0.15);
 
 :host {
-    display: block;
-    position: absolute;
-    outline: none;
-    z-index: 1002;
+}
+
+#popoverOverlay{
+  display: block;
+  outline: none;
+  z-index: 1002;
+  position: absolute;
+  width:100vw;
+  height:100vh;
+  top:0;
+  left:0;
+  background-color: rgba($black,0.15);
+  transition: opacity .10s ease-out;
+  opacity: 1;
+  visibility: visible;;
+}
+
+#popoverOverlay.fadeFromHidden{
+  opacity: 0;
+  visibility: hidden;
+  transition: visibility 0s .10s, opacity .10s ease-out;
+}
+
+#popoverWrapper{
+  position: absolute;
+  margin: $margin;
 }
 
 #popover {
     outline: none;
     padding: 15px;
     width: 284px;
+    border: 1px solid $popover-border-color;
     background-color: $popover-color;
-    margin: $margin;
+    margin: $carat;
     color: $popover-text-color;
+    box-shadow: 0px 1px 1px $popover-shadow-color;
     h6 {
         margin: 0;
     }
@@ -60,34 +86,60 @@ $popover-text-color: $black;
 
 div#carat {
     position: absolute;
-    width: 0;
-    height: 0;
-    &.bottom {
-        top: $carat;
-        border-left: $carat solid transparent;
-        border-right: $carat solid transparent;
-        border-bottom: $carat solid $popover-color;
-    }
+    width: 9.899px; //sqrt(7*7 + 7*7)
+    height: 9.899px;
+    background-color: $popover-color;
     &.top {
-        top: 0px;
-        border-left: $carat solid transparent;
-        border-right: $carat solid transparent;
-        border-top: $carat solid $popover-color;
+        border: 1px solid transparent;
+        border-color: transparent transparent $popover-border-color $popover-border-color ;
+        transform-origin: 50% 50%;
+        transform: rotate(-45deg);
+        box-shadow: 0px -2px 0px $popover-color,
+                    2px 0px 0px $popover-color,
+                    -1px 1px 1px $popover-shadow-color;
+    }
+    &.bottom {
+        border: 1px solid transparent;
+        border-color: $popover-border-color transparent transparent $popover-border-color;
+        transform-origin: 50% 50%;
+        transform: rotate(45deg);
     }
     &.left {
-        right: $carat;
-        border-top: $carat solid transparent;
-        border-bottom: $carat solid transparent;
-        border-left: $carat solid $popover-color;
+        border: 1px solid transparent;
+        border-color: $popover-border-color $popover-border-color transparent transparent;
+        transform-origin: 50% 50%;
+        transform: rotate(45deg);
+        box-shadow: 0px 2px 0px $popover-color,
+                    -2px 1px 0px $popover-color,
+                    1px 0px 1px $popover-shadow-color;
     }
     &.right {
-        left: $carat;
-        border-top: $carat solid transparent;
-        border-bottom: $carat solid transparent;
-        border-right: $carat solid $popover-color;
+        border: 1px solid transparent;
+        border-color: $popover-border-color transparent transparent  $popover-border-color;
+        transform-origin: 50% 50%;
+        transform: rotate(-45deg);
+        box-shadow: 0px 2px 0px $popover-color,
+                    2px 1px 0px $popover-color,
+                    -1px 0px 1px $popover-shadow-color;
     }
 }
 
+// Mozilla has a rendering issue drawing a thin line around the carat when the drop shadowdespite the overlapping
+@-moz-document url-prefix() {
+  div#carat {
+    &.top {
+      box-shadow: -1px 1px 0px $popover-shadow-color;
+    }
+    &.left{
+      box-shadow: 0px 2px 0px $popover-color,
+                  1px 0px 0px $popover-shadow-color;
+    }
+    &.right{
+      box-shadow: 0px 2px 0px $popover-color,
+                  -1px 0px 0px $popover-shadow-color;
+    }
+  }
+}
 // Trumps
 @import "inuit-clearfix/_trumps.clearfix.scss";
 @import "px-spacing-responsive-design/_trumps.spacing-responsive.scss";

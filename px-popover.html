@@ -37,13 +37,15 @@ elements are not supported.
 <dom-module id="px-popover">
     <link rel="import" type="css" href="css/px-popover.css"/>
     <template>
-        <div id="popoverWrapper" class="hidden">
+      <div id="popoverOverlay" class="fadeFromHidden">
+        <div id="popoverWrapper">
             <div id="carat"></div>
             <div id="popover">
-                <p>{{popoverTitle}}</p>
+                <p class="weight--semibold">{{popoverTitle}}</p>
                 <p>{{popoverBody}}</p>
             </div>
         </div>
+      </div>
     </template>
 </dom-module>
 
@@ -59,9 +61,7 @@ elements are not supported.
          */
         _values: { // attribute values
             INTERACTION: {
-                click: 'click',
-                focus: 'focus',
-                hover: 'hover'
+                click: 'click'
             },
             TYPE: {
                 top: 'top',
@@ -136,7 +136,7 @@ elements are not supported.
             var target;
             if (this.for) {
                 target = parentNode.querySelector('#' + this.for);
-            } else if (parentNode.nodeType === 11) { // DOCUMENT_FRAGMENT_NODE
+            } else if (parentNode.nodeType == 11) { // DOCUMENT_FRAGMENT_NODE
                 target = ownerRoot.host;
             } else {
                 target = parentNode;
@@ -146,25 +146,28 @@ elements are not supported.
         listeners: {
             'iron-resize': '_onIronResize'
         },
+        /**
+         * sets up listeners when popover is created
+         *
+         * @method attached
+         */
         attached: function () {
             this._target = this.target;
-            this.listen(document, 'click', '_toggle'); // we always listen to click so we can close when clicked outside
-            // this.listen(this, 'onscroll', '_onScroll');
-            if(this.interaction === this._values.INTERACTION.hover) {
-                this.listen(this._target, 'mouseenter', '_toggle');
-                this.listen(this._target, 'mouseleave', '_toggle');
-            } else if (this.interaction === this._values.INTERACTION.focus) {
-                this.listen(this._target, 'focus', '_toggle');
-                this.listen(this._target, 'blur', '_toggle');
-            }
+
+            // we always listen to click so we can close when clicked outside
+            this.listen(document, 'click', '_toggle');
+
+            // we always listen for a scroll so we can turn off the overlay/popover if the user scrolls away
+            this.listen(window, 'scroll', '_toggle');
         },
+        /**
+         * sets up listeners when popover is destroyed
+         *
+         * @method detached
+         */
         detached: function () {
-            // hover
-            this.unlisten(this._target, 'mouseenter', '_toggle');
-            this.unlisten(this._target, 'mouseleave', '_toggle');
-            // focus
-            this.unlisten(this._target, 'focus', '_toggle');
-            this.unlisten(this._target, 'blur', '_toggle');
+            // scroll
+            this.unlisten(window, 'scroll', '_toggle');
             // click
             this.unlisten(document, 'click', '_toggle');
         },
@@ -179,19 +182,22 @@ elements are not supported.
         _isDescendant: function (parent, child) {
         var node = child.parentNode;
             while (node != null) {
-                if (node === parent) {
+                if (node == parent) {
                     return true;
                 }
                 node = node.parentNode;
             }
             return false;
         },
+        /**
+         * Determines if event should yield a change in the popover visibility and sets up vars associated with the type of show event
+         *
+         * @method _toggle
+         */
         _toggle: function (event) {
-
             // hide the popover if a click is coming from the outside
-
             if(event.type === this._values.INTERACTION.click) {
-                if( this._isDescendant(this, event.target) ) {
+                if( this._isDescendant(this.$.popoverWrapper, event.target) ) {
                     return false;
                 } else {
                     if(event.target.id === this.for) {
@@ -210,15 +216,10 @@ elements are not supported.
                 }
             }
 
-            if (event.type === 'mouseenter' || event.type === 'mouseleave') {
-                if(event.target.id === this.for) {
-                    if(this._isShowing) {
-                        this._hide();
-                    } else {
-                        this._show();
-                    }
-                    return false;
-                }
+            if(event.type === this._values.INTERACTION.scroll){
+              if(this._isShowing) {
+                  this._hide();
+              }
             }
         },
         /**
@@ -228,7 +229,7 @@ elements are not supported.
          */
         _show: function () {
             // show this thing
-            this.$.popoverWrapper.classList.remove('hidden');
+            this.toggleClass('fadeFromHidden',false,this.$.popoverOverlay)
             this._setPosition();
             this._isShowing = true;
             this.fire('px-popover-show', {
@@ -242,21 +243,23 @@ elements are not supported.
          */
         _hide: function () {
             // hide this thing
-            this.$.popoverWrapper.classList.add('hidden');
-            this._isShowing = false;
+            this.toggleClass('fadeFromHidden',true,this.$.popoverOverlay)
+            this._isShowing = false
         },
+        /**
+         * Calcs which direction the popover should go and creates vars used in positioning the popover
+         *
+         * @method _setPosition
+         */
         _setPosition: function() {
-            if (!this._target) {
+            if (!this._target)
               return;
-            }
-
             // using this method so that we can calucate the best position
             // in the _positionXXX methods without having to do recursion.
             this.parentRect = this.offsetParent.getBoundingClientRect();
             this.targetRect = this._target.getBoundingClientRect();
-            this.thisRect = this.getBoundingClientRect();
-            this.caratRect = this.$.carat.getBoundingClientRect();
-            this.margin = parseInt(getComputedStyle(this.$.popover).marginTop.replace('px',''));
+            this.thisRect = this.$.popoverWrapper.getBoundingClientRect();
+            this.margin = parseInt(getComputedStyle(this.$.popoverWrapper).marginTop);
 
             if(this.orientation === this._values.TYPE.left) {
                 this._positionLeft();
@@ -273,60 +276,63 @@ elements are not supported.
         _autoPositon: function () {
             this._positionRight();
         },
-        _helpers: {
-            resetCaratStyle: function () {
-                this.$.carat.classList.remove(this._values.TYPE.top,this._values.TYPE.bottom,this._values.TYPE.left,this._values.TYPE.right);
-            }
-        },
+        /**
+         * Sets the left and top style attrs to position the popover. Using right or bottom attrs yields changing vars and are thus unreliable.
+         * Also, for mysterious reasons, this.targetRect is inconsistent. This._target.offsetX works consistently
+         *
+         * @method _positionTop,_positionBottom,_positionLeft,_positionRight
+         */
         _positionTop: function () {
             // add the style to the carat
             this.$.carat.classList.add(this._values.TYPE.top);
-            this.updateStyles();
+
+            // position the popover itself
+            this.$.popoverWrapper.style.left = this._target.offsetLeft - this.thisRect.width/2 + this.targetRect.width/2 - this.margin + 'px';
+            this.$.popoverWrapper.style.top = this._target.offsetTop - this.thisRect.height - this.margin * 2 + 'px';
+
             // move the carat to the correct position
             this.caratRect = this.$.carat.getBoundingClientRect();
-            this.$.carat.style.left = (this.thisRect.width/2) - (this.caratRect.width/2) + 'px';
-            this.$.carat.style.top = (this.thisRect.height - this.margin) + 'px';
-            // position the popover itself
-            var centerOffset = (this.targetRect.width - this.thisRect.width) / 2;
-            this.style.left = (this._target.offsetLeft - (this.thisRect.width/2) + (this.targetRect.width/2)) + 'px';
-            this.style.top = (this._target.offsetTop - this.thisRect.height) + this.margin/2 - 5 + 'px';
+            this.$.carat.style.left = this.thisRect.width/2 - this.margin + 'px';
+            this.$.carat.style.top = this.thisRect.height - this.caratRect.height + 1 + 'px';
         },
         _positionBottom: function () {
             // add the style to the carat
-            this.$.carat.classList.remove(this._values.TYPE.top,this._values.TYPE.bottom,this._values.TYPE.left,this._values.TYPE.right);
+            //
             this.$.carat.classList.add(this._values.TYPE.bottom);
-            this.updateStyles();
-            // move the carat to the correct position
             this.caratRect = this.$.carat.getBoundingClientRect();
-            this.$.carat.style.left = (this.thisRect.width/2) - (this.caratRect.width/2) + 'px';
+
             // position the popover itself
-            var centerOffset = (this.targetRect.width - this.thisRect.width) / 2;
-            this.style.left = (this._target.offsetLeft - (this.thisRect.width/2) + (this.targetRect.width/2)) + 'px';
-            this.style.top = ((this._target.offsetTop + this.targetRect.height) - this.caratRect.height) + 5 + 'px';
+            this.$.popoverWrapper.style.left = this._target.offsetLeft - this.thisRect.width/2 + this.targetRect.width/2 - this.margin + 'px';
+            this.$.popoverWrapper.style.top = this._target.offsetTop + this.targetRect.height - 1 + 'px';
+
+            // move the carat to the correct position
+            this.$.carat.style.left = this.thisRect.width/2 - this.margin + 'px';
+            this.$.carat.style.top = '3px';
         },
         _positionLeft: function () {
             // add the style to the carat
-            this.$.carat.classList.remove(this._values.TYPE.top,this._values.TYPE.bottom,this._values.TYPE.left,this._values.TYPE.right);
             this.$.carat.classList.add(this._values.TYPE.left);
-            this.updateStyles();
-            // move the carat to the correct position
             this.caratRect = this.$.carat.getBoundingClientRect();
-            this.$.carat.style.top = (this.thisRect.height/2) - (this.caratRect.width) + 'px';
+
             // position the popover itself
-            this.style.left = (this._target.offsetLeft - this.thisRect.width) + (this.margin/2) - 5 + 'px';
-            this.style.top = Math.round( (this._target.offsetTop + (this.targetRect.height/2)) - (this.thisRect.height/2)) + 'px';
+            this.$.popoverWrapper.style.left = this._target.offsetLeft - this.thisRect.width - this.margin * 2 + 'px';
+            this.$.popoverWrapper.style.top = this._target.offsetTop + this.targetRect.height/2  - this.thisRect.height/2 - this.margin + 'px';
+
+            // move the carat to the correct position
+            this.$.carat.style.top = this.thisRect.height/2 - this.margin + 'px';
+            this.$.carat.style.left = this.thisRect.width - this.caratRect.width/2 - this.margin + 'px';
         },
         _positionRight: function () {
-            this.$.carat.classList.remove(this._values.TYPE.top,this._values.TYPE.bottom,this._values.TYPE.left,this._values.TYPE.right);
-
             this.$.carat.classList.add(this._values.TYPE.right);
-            this.updateStyles();
-            // move the carat to the correct position
             this.caratRect = this.$.carat.getBoundingClientRect();
-            this.$.carat.style.top = (this.thisRect.height/2) - (this.caratRect.width) + 'px';
-            // position the popover itself
-            this.style.left = ((this._target.offsetLeft + this.targetRect.width) - this.caratRect.width) + 5 + 'px';
-            this.style.top = Math.round( (this._target.offsetTop + (this.targetRect.height/2)) - (this.thisRect.height/2)) + 'px';
+
+            this.$.popoverWrapper.style.left = this._target.offsetLeft + this.targetRect.width + 'px';
+            this.$.popoverWrapper.style.top = this._target.offsetTop + this.targetRect.height/2  - this.thisRect.height/2 - this.margin + 'px';
+
+
+            // move the carat to the correct position
+            this.$.carat.style.top = this.thisRect.height/2 - this.margin + 'px';
+            this.$.carat.style.left = '2px';
         }
 
     });

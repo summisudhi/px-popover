@@ -58,6 +58,7 @@
 
             <button id="btnDown" type="button" name="button">Down</button>
             <px-popover
+                id="testPopoverDown"
                 for="btnDown"
                 interaction="click"
                 orientation="bottom"
@@ -67,6 +68,7 @@
 
             <button id="btnLeft" type="button" name="button">Left</button>
             <px-popover
+                id="testPopoverLeft"
                 for="btnLeft"
                 interaction="click"
                 orientation="left"
@@ -76,6 +78,7 @@
 
             <button id="btnRight" type="button" name="button">Right</button>
             <px-popover
+                id="testPopoverRight"
                 for="btnRight"
                 interaction="click"
                 orientation="right"
@@ -84,17 +87,6 @@
             </px-popover>
         </div>
         <p></p>
-        <div class="sample-container">
-            <div id="hoverDiv" class="hover-popover">Hover for popover</div>
-            <px-popover
-                id="testPopoupHover"
-                for="hoverDiv"
-                interaction="hover"
-                orientation="bottom"
-                popover-title="Bottom Popover"
-                popover-body="Lorem ipsum dolor sit amet, consectetur elit, sed do eiusmod.">
-            </px-popover>
-        </div>
 
         <script>
             suite('<px-popover>', function() {
@@ -121,28 +113,185 @@
                 });
 
                 test('hides popover before click', function() {
-                    var wrapper = document.querySelectorAll('#testPopoverUp #popoverWrapper')[0];
-                    expect(wrapper.classList.contains('hidden')).to.equal(true);
+                    var wrapper = document.querySelectorAll('#testPopoverUp #popoverOverlay')[0];
+                    expect(wrapper.classList.contains('fadeFromHidden')).to.equal(true);
                 });
 
                 test('shows popover after click', function() {
                     document.getElementById(testPopoverUp.for).click();
-                    var wrapper = document.querySelectorAll('#testPopoverUp #popoverWrapper')[0];
-                    expect(wrapper.classList.contains('hidden')).to.equal(false);
+                    var wrapper = document.querySelectorAll('#testPopoverUp #popoverOverlay')[0];
+                    expect(wrapper.classList.contains('fadeFromHidden')).to.equal(false);
                 });
 
                 test('popover closes again after click outside', function() {
                     document.querySelector('.sample-container').click();
-                    var wrapper = document.querySelectorAll('#testPopoverUp #popoverWrapper')[0];
-                    expect(wrapper.classList.contains('hidden')).to.equal(true);
+                    var wrapper = document.querySelectorAll('#testPopoverUp #popoverOverlay')[0];
+                    expect(wrapper.classList.contains('fadeFromHidden')).to.equal(true);
                 });
 
-                // test('shows popup on hover', function() {
-                //     document.getElementById('hoverDiv').onmouseenter();
-                //     var wrapper = document.querySelectorAll('#testPopoupHover #popoverWrapper')[0];
-                //     expect(wrapper.hidden).to.equal(false);
-                // });
+                test('Top popover has correct vertical position', function(done) {
+                    document.querySelector('#btnUp').click();
+                    flush(function() {
+                      var margin = 5;
+                      var popTop = document.querySelector('#testPopoverUp #popoverWrapper').getBoundingClientRect().bottom;
+                      var btnTop = document.querySelector('#btnUp').getBoundingClientRect().top - margin;
+                      assert.closeTo(btnTop, popTop, 1, 'numbers are close');
+                      done();
+                    });
+                });
 
+                test('top popover has correct horizontal position', function(done) {
+                    var btn = document.querySelector('#btnUp').click();
+                    flush(function() {
+                      var popTop = document.querySelector('#testPopoverUp #popoverWrapper').getBoundingClientRect().left + document.querySelector('#testPopoverUp #popoverWrapper').getBoundingClientRect().width/2;
+                      var btnTop = document.querySelector('#btnUp').getBoundingClientRect().left + document.querySelector('#btnUp').getBoundingClientRect().width/2;
+                      assert.closeTo(btnTop, popTop, 1, 'numbers are close');
+                      done();
+                    });
+                });
+
+                test('top carat has correct vertical position', function(done) {
+                    var btn = document.querySelector('#btnUp').click();
+                    flush(function() {
+                      var popTop = document.querySelector('#testPopoverUp #popoverWrapper').getBoundingClientRect().bottom - document.querySelector('#testPopoverUp #popoverWrapper #carat').getBoundingClientRect().height/2;
+                      var carat = document.querySelector('#testPopoverUp #popoverWrapper #carat').getBoundingClientRect().top +  document.querySelector('#testPopoverUp #popoverWrapper #carat').getBoundingClientRect().height/2;
+                      assert.closeTo(carat, popTop, 2, 'numbers are close');
+                      done();
+                    });
+                });
+
+                test('top carat has correct horizontal position', function(done) {
+                    var btn = document.querySelector('#btnUp').click();
+                    flush(function() {
+                      var popTop = document.querySelector('#testPopoverUp #popoverWrapper').getBoundingClientRect().left + document.querySelector('#testPopoverUp #popoverWrapper').getBoundingClientRect().width/2;
+                      var carat = document.querySelector('#testPopoverUp #popoverWrapper #carat').getBoundingClientRect().left + document.querySelector('#testPopoverUp #popoverWrapper #carat').getBoundingClientRect().width/2;
+                      assert.closeTo(carat, popTop, 1, 'numbers are close');
+                      done();
+                    });
+                });
+
+                test('Bottom popover has correct vertical position', function(done) {
+                    document.querySelector('#btnDown').click();
+                    flush(function() {
+                      var margin = 5;
+                      var popDown = document.querySelector('#testPopoverDown #popoverWrapper').getBoundingClientRect().top;
+                      var btnDown = document.querySelector('#btnDown').getBoundingClientRect().bottom + margin;
+                      assert.closeTo(btnDown, popDown, 1, 'numbers are close');
+                      done();
+                    });
+                });
+
+                test('Bottom popover has correct horizontal position', function(done) {
+                    document.querySelector('#btnDown').click();
+                    flush(function() {
+                      var popDown = document.querySelector('#testPopoverDown #popoverWrapper').getBoundingClientRect().left + document.querySelector('#testPopoverDown #popoverWrapper').getBoundingClientRect().width/2;
+                      var btnDown = document.querySelector('#btnDown').getBoundingClientRect().left + document.querySelector('#btnDown').getBoundingClientRect().width/2;
+                      assert.closeTo(btnDown, popDown, 1, 'numbers are close');
+                      done();
+                    });
+                });
+
+                test('Bottom carat has correct vertical position', function(done) {
+                    var btn = document.querySelector('#btnDown').click();
+                    flush(function() {
+                      var popDown = document.querySelector('#testPopoverDown #popoverWrapper').getBoundingClientRect().top + document.querySelector('#testPopoverDown #popoverWrapper #carat').getBoundingClientRect().height/2;
+                      var carat = document.querySelector('#testPopoverDown #popoverWrapper #carat').getBoundingClientRect().bottom -  document.querySelector('#testPopoverDown #popoverWrapper #carat').getBoundingClientRect().height/2;
+                      assert.closeTo(carat, popDown, 2, 'numbers are close');
+                      done();
+                    });
+                });
+
+                test('Bottom carat has correct horizontal position', function(done) {
+                    var btn = document.querySelector('#btnDown').click();
+                    flush(function() {
+                      var popDown = document.querySelector('#testPopoverDown #popoverWrapper').getBoundingClientRect().left + document.querySelector('#testPopoverDown #popoverWrapper').getBoundingClientRect().width/2;
+                      var carat = document.querySelector('#testPopoverDown #popoverWrapper #carat').getBoundingClientRect().left + document.querySelector('#testPopoverDown #popoverWrapper #carat').getBoundingClientRect().width/2;
+                      assert.closeTo(carat, popDown, 1, 'numbers are close');
+                      done();
+                    });
+                });
+
+                test('Left popover has correct vertical position', function(done) {
+                    document.querySelector('#btnLeft').click();
+                    flush(function() {
+                      var popLeft = document.querySelector('#testPopoverLeft #popoverWrapper').getBoundingClientRect().top + document.querySelector('#testPopoverLeft #popoverWrapper').getBoundingClientRect().height/2;
+                      var btnLeft = document.querySelector('#btnLeft').getBoundingClientRect().top + document.querySelector('#btnLeft').getBoundingClientRect().height/2;
+                      assert.closeTo(btnLeft, popLeft, 1, 'numbers are close');
+                      done();
+                    });
+                });
+
+                test('Left popover has correct horizontal position', function(done) {
+                    document.querySelector('#btnLeft').click();
+                    flush(function() {
+                      var margin = 5;
+                      var popLeft = document.querySelector('#testPopoverLeft #popoverWrapper').getBoundingClientRect().right + margin;
+                      var btnLeft = document.querySelector('#btnLeft').getBoundingClientRect().left;
+                      assert.closeTo(btnLeft, popLeft, 1, 'numbers are close');
+                      done();
+                    });
+                });
+
+                test('Left carat has correct vertical position', function(done) {
+                    var btn = document.querySelector('#btnLeft').click();
+                    flush(function() {
+                      var popLeft = document.querySelector('#testPopoverLeft #popoverWrapper').getBoundingClientRect().top + document.querySelector('#testPopoverLeft #popoverWrapper').getBoundingClientRect().height/2;
+                      var carat = document.querySelector('#testPopoverLeft #popoverWrapper #carat').getBoundingClientRect().top +  document.querySelector('#testPopoverLeft #popoverWrapper #carat').getBoundingClientRect().height/2;
+                      assert.closeTo(carat, popLeft, 1, 'numbers are close');
+                      done();
+                    });
+                });
+
+                test('Left carat has correct horizontal position', function(done) {
+                    var btn = document.querySelector('#btnLeft').click();
+                    flush(function() {
+                      var popLeft = document.querySelector('#testPopoverLeft #popoverWrapper').getBoundingClientRect().right - document.querySelector('#testPopoverLeft #popoverWrapper #carat').getBoundingClientRect().width/2;
+                      var carat = document.querySelector('#testPopoverLeft #popoverWrapper #carat').getBoundingClientRect().left + document.querySelector('#testPopoverLeft #popoverWrapper #carat').getBoundingClientRect().width/2;
+                      assert.closeTo(carat, popLeft, 2, 'numbers are close');
+                      done();
+                    });
+                });
+
+                test('Right popover has correct vertical position', function(done) {
+                    document.querySelector('#btnRight').click();
+                    flush(function() {
+                      var popRight = document.querySelector('#testPopoverRight #popoverWrapper').getBoundingClientRect().top + document.querySelector('#testPopoverRight #popoverWrapper').getBoundingClientRect().height/2;
+                      var btnRight = document.querySelector('#btnRight').getBoundingClientRect().top + document.querySelector('#btnRight').getBoundingClientRect().height/2;
+                      assert.closeTo(btnRight, popRight, 1, 'numbers are close');
+                      done();
+                    });
+                });
+
+                test('Right popover has correct horizontal position', function(done) {
+                    document.querySelector('#btnRight').click();
+                    flush(function() {
+                      var margin = 5;
+                      var popRight = document.querySelector('#testPopoverRight #popoverWrapper').getBoundingClientRect().left - margin;
+                      var btnRight = document.querySelector('#btnRight').getBoundingClientRect().right;
+                      assert.closeTo(btnRight, popRight, 1, 'numbers are close');
+                      done();
+                    });
+                });
+
+                test('Right carat has correct vertical position', function(done) {
+                    var btn = document.querySelector('#btnRight').click();
+                    flush(function() {
+                      var popRight = document.querySelector('#testPopoverRight #popoverWrapper').getBoundingClientRect().top + document.querySelector('#testPopoverRight #popoverWrapper').getBoundingClientRect().height/2;
+                      var carat = document.querySelector('#testPopoverRight #popoverWrapper #carat').getBoundingClientRect().top +  document.querySelector('#testPopoverRight #popoverWrapper #carat').getBoundingClientRect().height/2;
+                      assert.closeTo(carat, popRight, 1, 'numbers are close');
+                      done();
+                    });
+                });
+
+                test('Right carat has correct horizontal position', function(done) {
+                    var btn = document.querySelector('#btnRight').click();
+                    flush(function() {
+                      var popRight = document.querySelector('#testPopoverRight #popoverWrapper').getBoundingClientRect().left - document.querySelector('#testPopoverRight #popoverWrapper #carat').getBoundingClientRect().width/2;
+                      var carat = document.querySelector('#testPopoverRight #popoverWrapper #carat').getBoundingClientRect().left - document.querySelector('#testPopoverRight #popoverWrapper #carat').getBoundingClientRect().width/2;
+                      assert.closeTo(carat, popRight, 2, 'numbers are close');
+                      done();
+                    });
+                });
             });
       </script>
     </body>
