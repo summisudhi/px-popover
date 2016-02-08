@@ -7,6 +7,7 @@
 -->
 <link rel="import" href="../polymer/polymer.html"/>
 <link rel="import" href="../iron-resizable-behavior/iron-resizable-behavior.html">
+<link rel="import" href="../px-overlay/px-overlay.html" />
 
 
 <!--
@@ -26,7 +27,7 @@ elements are not supported.
 
     <div class="static-parent">
         <div id="someElement">Some element</div>
-        <px-popover for="someElement" interaction="click" orientation="bottom" popover-title="Bottom Popover" popover-body="Lorem ipsum dolor sit amet, consectetur elit, sed do eiusmod."></px-popover>
+        <px-popover for="someElement" orientation="bottom" popover-title="Bottom Popover" popover-body="Lorem ipsum dolor sit amet, consectetur elit, sed do eiusmod."></px-popover>
     </div>
 
 @element px-popover
@@ -37,14 +38,13 @@ elements are not supported.
 <dom-module id="px-popover">
     <link rel="import" type="css" href="css/px-popover.css"/>
     <template>
-      <div id="popoverOverlay" class="fadeFromHidden">
-        <div id="popoverWrapper">
-            <div id="carat"></div>
-            <div id="popover">
-                <p class="weight--semibold">{{popoverTitle}}</p>
-                <p>{{popoverBody}}</p>
-            </div>
-        </div>
+      <px-overlay type="light"></px-overlay>
+      <div id="popoverWrapper">
+          <div id="carat"></div>
+          <div id="popover">
+              <p class="weight--semibold">{{popoverTitle}}</p>
+              <p>{{popoverBody}}</p>
+          </div>
       </div>
     </template>
 </dom-module>
@@ -60,9 +60,6 @@ elements are not supported.
          * Private Properties, used in internal view logic.
          */
         _values: { // attribute values
-            INTERACTION: {
-                click: 'click'
-            },
             TYPE: {
                 top: 'top',
                 bottom: 'bottom',
@@ -71,7 +68,6 @@ elements are not supported.
             }
         },
         _isShowing: false,
-        _mouseInside: false,
         /**
          * Properties block, expose attribute values to the DOM via 'reflect'
          *
@@ -101,17 +97,6 @@ elements are not supported.
                 type: String,
                 reflect: true,
                 value: 'auto'
-            },
-            /**
-             * The interaction event the invokes the popover
-             * - 'click' for ouse click or tap
-             * - 'hover' for mouse hover (not recommended for mobile clients)
-             * - 'focus' for element focus (for use with form elements)
-             */
-            interaction: {
-                type: String,
-                reflect: true,
-                value: 'click'
             },
             /**
              * The String to be display in the popover title
@@ -155,10 +140,8 @@ elements are not supported.
             this._target = this.target;
 
             // we always listen to click so we can close when clicked outside
-            this.listen(document, 'click', '_toggle');
-
-            // we always listen for a scroll so we can turn off the overlay/popover if the user scrolls away
-            this.listen(window, 'scroll', '_toggle');
+            this.listen(this._target, 'click', '_toggle');
+            this.listen(this, 'click', '_toggle');
         },
         /**
          * sets up listeners when popover is destroyed
@@ -175,9 +158,6 @@ elements are not supported.
             if(this._isShowing) {
                 this._setPosition();
             }
-        },
-        _setMouseInside: function () {
-            this._mouseInside = true;
         },
         _isDescendant: function (parent, child) {
         var node = child.parentNode;
@@ -196,7 +176,7 @@ elements are not supported.
          */
         _toggle: function (event) {
             // hide the popover if a click is coming from the outside
-            if(event.type === this._values.INTERACTION.click) {
+            if(event.type === 'click') {
                 if( this._isDescendant(this.$.popoverWrapper, event.target) ) {
                     return false;
                 } else {
@@ -215,12 +195,6 @@ elements are not supported.
                     }
                 }
             }
-
-            if(event.type === this._values.INTERACTION.scroll){
-              if(this._isShowing) {
-                  this._hide();
-              }
-            }
         },
         /**
          * Display the popover
@@ -229,12 +203,15 @@ elements are not supported.
          */
         _show: function () {
             // show this thing
-            this.toggleClass('fadeFromHidden',false,this.$.popoverOverlay)
+            this.toggleClass('fadeFromHidden',true)
             this._setPosition();
             this._isShowing = true;
             this.fire('px-popover-show', {
                 target: this
             });
+
+            // listen for a scroll so we can turn off the overlay/popover if the user scrolls away
+            // this.listen(window, 'scroll', '_hide');
         },
         /**
          * Hide the popover
@@ -243,8 +220,11 @@ elements are not supported.
          */
         _hide: function () {
             // hide this thing
-            this.toggleClass('fadeFromHidden',true,this.$.popoverOverlay)
-            this._isShowing = false
+            this.toggleClass('fadeFromHidden',false)
+            this._isShowing = false;
+
+            // get rid of the scroll listener
+            this.unlisten(window, 'scroll', '_toggle');
         },
         /**
          * Calcs which direction the popover should go and creates vars used in positioning the popover
@@ -304,6 +284,7 @@ elements are not supported.
             // position the popover itself
             this.$.popoverWrapper.style.left = this._target.offsetLeft - this.thisRect.width/2 + this.targetRect.width/2 - this.margin + 'px';
             this.$.popoverWrapper.style.top = this._target.offsetTop + this.targetRect.height - 1 + 'px';
+
 
             // move the carat to the correct position
             this.$.carat.style.left = this.thisRect.width/2 - this.margin + 'px';
