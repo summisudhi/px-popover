@@ -7,6 +7,7 @@
 -->
 <link rel="import" href="../polymer/polymer.html"/>
 <link rel="import" href="../iron-resizable-behavior/iron-resizable-behavior.html">
+<link rel="import" href="../px-overlay/px-overlay.html" />
 
 
 <!--
@@ -26,7 +27,7 @@ elements are not supported.
 
     <div class="static-parent">
         <div id="someElement">Some element</div>
-        <px-popover for="someElement" interaction="click" orientation="bottom" popover-title="Bottom Popover" popover-body="Lorem ipsum dolor sit amet, consectetur elit, sed do eiusmod."></px-popover>
+        <px-popover for="someElement" orientation="bottom" popover-title="Bottom Popover" popover-body="Lorem ipsum dolor sit amet, consectetur elit, sed do eiusmod."></px-popover>
     </div>
 
 @element px-popover
@@ -37,14 +38,13 @@ elements are not supported.
 <dom-module id="px-popover">
     <link rel="import" type="css" href="css/px-popover.css"/>
     <template>
-      <div id="popoverOverlay" class="fadeFromHidden">
-        <div id="popoverWrapper">
-            <div id="carat"></div>
-            <div id="popover">
-                <p class="weight--semibold">{{popoverTitle}}</p>
-                <p>{{popoverBody}}</p>
-            </div>
-        </div>
+      <px-overlay type="light"></px-overlay>
+      <div id="popoverWrapper">
+          <div id="carat"></div>
+          <div id="popover">
+              <p class="weight--semibold">{{popoverTitle}}</p>
+              <p>{{popoverBody}}</p>
+          </div>
       </div>
     </template>
 </dom-module>
@@ -60,9 +60,6 @@ elements are not supported.
          * Private Properties, used in internal view logic.
          */
         _values: { // attribute values
-            INTERACTION: {
-                click: 'click'
-            },
             TYPE: {
                 top: 'top',
                 bottom: 'bottom',
@@ -71,7 +68,6 @@ elements are not supported.
             }
         },
         _isShowing: false,
-        _mouseInside: false,
         /**
          * Properties block, expose attribute values to the DOM via 'reflect'
          *
@@ -103,17 +99,6 @@ elements are not supported.
                 value: 'auto'
             },
             /**
-             * The interaction event the invokes the popover
-             * - 'click' for ouse click or tap
-             * - 'hover' for mouse hover (not recommended for mobile clients)
-             * - 'focus' for element focus (for use with form elements)
-             */
-            interaction: {
-                type: String,
-                reflect: true,
-                value: 'click'
-            },
-            /**
              * The String to be display in the popover title
              */
             popoverTitle: {
@@ -128,6 +113,13 @@ elements are not supported.
                 type: String,
                 reflect: true,
                 value: 'Capable of displaying a longer body text than a tootip.'
+            },
+            /**
+             * If the popover is in a position relative or static ancestor
+             */
+            position: {
+              type:String,
+              value:"absolute"
             }
         },
         get target () {
@@ -136,6 +128,7 @@ elements are not supported.
             var target;
             if (this.for) {
                 target = parentNode.querySelector('#' + this.for);
+            //if web component
             } else if (parentNode.nodeType == 11) { // DOCUMENT_FRAGMENT_NODE
                 target = ownerRoot.host;
             } else {
@@ -155,10 +148,15 @@ elements are not supported.
             this._target = this.target;
 
             // we always listen to click so we can close when clicked outside
-            this.listen(document, 'click', '_toggle');
+            this.listen(this._target, 'click', '_toggle');
+            this.listen(this, 'click', '_toggle');
 
-            // we always listen for a scroll so we can turn off the overlay/popover if the user scrolls away
-            this.listen(window, 'scroll', '_toggle');
+            // if a parent was transformed and our overlay is no longer at window origin...
+            var overlayRect = this.$$('px-overlay').getBoundingClientRect();
+            if(overlayRect['left'] != 0 || overlayRect['top'] != 0){
+              this.$$('px-overlay').style.left = -1 * overlayRect['left'] + 'px';
+              this.$$('px-overlay').style.top = -1 * overlayRect['top'] + 'px';
+            }
         },
         /**
          * sets up listeners when popover is destroyed
@@ -175,9 +173,6 @@ elements are not supported.
             if(this._isShowing) {
                 this._setPosition();
             }
-        },
-        _setMouseInside: function () {
-            this._mouseInside = true;
         },
         _isDescendant: function (parent, child) {
         var node = child.parentNode;
@@ -196,7 +191,7 @@ elements are not supported.
          */
         _toggle: function (event) {
             // hide the popover if a click is coming from the outside
-            if(event.type === this._values.INTERACTION.click) {
+            if(event.type === 'click') {
                 if( this._isDescendant(this.$.popoverWrapper, event.target) ) {
                     return false;
                 } else {
@@ -215,12 +210,6 @@ elements are not supported.
                     }
                 }
             }
-
-            if(event.type === this._values.INTERACTION.scroll){
-              if(this._isShowing) {
-                  this._hide();
-              }
-            }
         },
         /**
          * Display the popover
@@ -229,12 +218,15 @@ elements are not supported.
          */
         _show: function () {
             // show this thing
-            this.toggleClass('fadeFromHidden',false,this.$.popoverOverlay)
+            this.toggleClass('fadeFromHidden',true)
             this._setPosition();
             this._isShowing = true;
             this.fire('px-popover-show', {
                 target: this
             });
+
+            // listen for a scroll so we can turn off the overlay/popover if the user scrolls away
+            // this.listen(window, 'scroll', '_hide');
         },
         /**
          * Hide the popover
@@ -243,8 +235,11 @@ elements are not supported.
          */
         _hide: function () {
             // hide this thing
-            this.toggleClass('fadeFromHidden',true,this.$.popoverOverlay)
-            this._isShowing = false
+            this.toggleClass('fadeFromHidden',false)
+            this._isShowing = false;
+
+            // get rid of the scroll listener
+            this.unlisten(window, 'scroll', '_toggle');
         },
         /**
          * Calcs which direction the popover should go and creates vars used in positioning the popover
@@ -272,13 +267,13 @@ elements are not supported.
             } else { // auto
                 this._autoPositon();
             }
+
         },
         _autoPositon: function () {
             this._positionRight();
         },
         /**
          * Sets the left and top style attrs to position the popover. Using right or bottom attrs yields changing vars and are thus unreliable.
-         * Also, for mysterious reasons, this.targetRect is inconsistent. This._target.offsetX works consistently
          *
          * @method _positionTop,_positionBottom,_positionLeft,_positionRight
          */
@@ -287,8 +282,15 @@ elements are not supported.
             this.$.carat.classList.add(this._values.TYPE.top);
 
             // position the popover itself
-            this.$.popoverWrapper.style.left = this._target.offsetLeft - this.thisRect.width/2 + this.targetRect.width/2 - this.margin + 'px';
-            this.$.popoverWrapper.style.top = this._target.offsetTop - this.thisRect.height - this.margin * 2 + 'px';
+            if(this.inRelativeElement()){
+              var xCoord = this.targetRect.width/2 - this.thisRect.width/2 - this.margin;
+              var yCoord = 0 - this.thisRect.height - this.margin * 2;
+              this.$.popoverWrapper.style.top =  yCoord + 'px';
+              this.$.popoverWrapper.style.left = xCoord + 'px';
+            } else{
+              this.$.popoverWrapper.style.left = this.targetRect.left + window.scrollX - this.thisRect.width/2 + this.targetRect.width/2 - this.margin + 'px';
+              this.$.popoverWrapper.style.top = this.targetRect.top + window.scrollY - this.thisRect.height - this.margin * 2 + 'px';
+            }
 
             // move the carat to the correct position
             this.caratRect = this.$.carat.getBoundingClientRect();
@@ -302,9 +304,15 @@ elements are not supported.
             this.caratRect = this.$.carat.getBoundingClientRect();
 
             // position the popover itself
-            this.$.popoverWrapper.style.left = this._target.offsetLeft - this.thisRect.width/2 + this.targetRect.width/2 - this.margin + 'px';
-            this.$.popoverWrapper.style.top = this._target.offsetTop + this.targetRect.height - 1 + 'px';
+            if(this.inRelativeElement()){
 
+              var xCoord = this.targetRect.width/2 - this.thisRect.width/2 - this.margin;
+              this.$.popoverWrapper.style.left = xCoord + 'px';
+
+            } else{
+              this.$.popoverWrapper.style.left = this.targetRect.left + window.scrollX - this.thisRect.width/2 + this.targetRect.width/2 - this.margin + 'px';
+              this.$.popoverWrapper.style.top = this.targetRect.top + window.scrollY + this.targetRect.height - 1 + 'px';
+            }
             // move the carat to the correct position
             this.$.carat.style.left = this.thisRect.width/2 - this.margin + 'px';
             this.$.carat.style.top = '3px';
@@ -315,8 +323,15 @@ elements are not supported.
             this.caratRect = this.$.carat.getBoundingClientRect();
 
             // position the popover itself
-            this.$.popoverWrapper.style.left = this._target.offsetLeft - this.thisRect.width - this.margin * 2 + 'px';
-            this.$.popoverWrapper.style.top = this._target.offsetTop + this.targetRect.height/2  - this.thisRect.height/2 - this.margin + 'px';
+            if(this.inRelativeElement()){
+              var xCoord = 0 - this.thisRect.width - this.margin * 2;
+              var yCoord = this.targetRect.height/2 - this.thisRect.height/2 - this.margin;
+              this.$.popoverWrapper.style.top =  yCoord + 'px';
+              this.$.popoverWrapper.style.left = xCoord + 'px';
+            } else{
+              this.$.popoverWrapper.style.left = this.targetRect.left + window.scrollX - this.thisRect.width - this.margin * 2 + 'px';
+              this.$.popoverWrapper.style.top = this.targetRect.top  + window.scrollY + this.targetRect.height/2  - this.thisRect.height/2 - this.margin + 'px';
+            }
 
             // move the carat to the correct position
             this.$.carat.style.top = this.thisRect.height/2 - this.margin + 'px';
@@ -326,13 +341,26 @@ elements are not supported.
             this.$.carat.classList.add(this._values.TYPE.right);
             this.caratRect = this.$.carat.getBoundingClientRect();
 
-            this.$.popoverWrapper.style.left = this._target.offsetLeft + this.targetRect.width + 'px';
-            this.$.popoverWrapper.style.top = this._target.offsetTop + this.targetRect.height/2  - this.thisRect.height/2 - this.margin + 'px';
-
+            if(this.inRelativeElement()){
+              var xCoord = this.targetRect.width;
+              var yCoord = this.targetRect.height/2 - this.thisRect.height/2 - this.margin;
+              this.$.popoverWrapper.style.top =  yCoord + 'px';
+              this.$.popoverWrapper.style.left = xCoord + 'px';
+            } else {
+              this.$.popoverWrapper.style.left = this.targetRect.left  + window.scrollX + this.targetRect.width + 'px';
+              this.$.popoverWrapper.style.top = this.targetRect.top  + window.scrollY + this.targetRect.height/2  - this.thisRect.height/2 - this.margin + 'px';
+            }
 
             // move the carat to the correct position
             this.$.carat.style.top = this.thisRect.height/2 - this.margin + 'px';
             this.$.carat.style.left = '2px';
+        },
+        inRelativeElement: function(){
+          if(this.position != "relative"){
+            return false
+          } else {
+            return true
+          }
         }
 
     });

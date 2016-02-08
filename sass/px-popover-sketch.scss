@@ -39,31 +39,20 @@ $popover-text-color: $black;
 $popover-shadow-color: rgba($black,0.15);
 
 :host {
-}
-
-#popoverOverlay{
-  display: block;
-  outline: none;
-  z-index: 1002;
-  position: absolute;
-  width:100vw;
-  height:100vh;
-  top:0;
-  left:0;
-  background-color: rgba($black,0.15);
-  transition: opacity .10s ease-out;
-  opacity: 1;
-  visibility: visible;;
-}
-
-#popoverOverlay.fadeFromHidden{
   opacity: 0;
   visibility: hidden;
   transition: visibility 0s .10s, opacity .10s ease-out;
+
+  &.fadeFromHidden{
+    transition: opacity .10s ease-out;
+    opacity: 1;
+    visibility: visible;
+  }
 }
 
 #popoverWrapper{
   position: absolute;
+  z-index: 1005;
   margin: $margin;
 }
 
