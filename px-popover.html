@@ -17,10 +17,10 @@ Simply place the the px-popover next to the element that you want it to attach t
 Set the 'for' attribute to the 'id' of the element that it's associated with. Then Set
 the 'popover-title' and 'popover-body' attributes. The popover will automatically grow
 to encapsulate the contents that you have established. The 'interaction' attribute specifies
-the event that the popover is bound to, currently the popover supports 'click', 'focus' and ‘hover’.
+the event that the popover is bound to, currently the popover supports 'click'.
 
 NOTE: currently the popover must be a sibling of the associated element, both should
-contained within a 'static' element such as a DIV. Relative or aboslute positioned parent
+contained within a 'static' element such as a DIV. If in a relative positioned ancestor, wrap the target and popover in another relative positioned element. Aboslute positioned parent
 elements are not supported.
 
 ##### Usage
@@ -28,6 +28,15 @@ elements are not supported.
     <div class="static-parent">
         <div id="someElement">Some element</div>
         <px-popover for="someElement" orientation="bottom" popover-title="Bottom Popover" popover-body="Lorem ipsum dolor sit amet, consectetur elit, sed do eiusmod."></px-popover>
+    </div>
+
+    //If in a relative position ancestor:
+    <div class="static-parent" style="position:relative;">
+        <div style="position:relative;">
+            <div id="someElement">Some element</div>
+            <px-popover for="someElement" orientation="bottom" popover-title="Bottom Popover" popover-body="Lorem ipsum dolor sit amet, consectetur elit, sed do eiusmod."></px-popover
+            position="relative" >
+        </div>
     </div>
 
 @element px-popover
@@ -154,8 +163,17 @@ elements are not supported.
             // if a parent was transformed and our overlay is no longer at window origin...
             var overlayRect = this.$$('px-overlay').getBoundingClientRect();
             if(overlayRect['left'] != 0 || overlayRect['top'] != 0){
-              this.$$('px-overlay').style.left = -1 * overlayRect['left'] + 'px';
-              this.$$('px-overlay').style.top = -1 * overlayRect['top'] + 'px';
+              var self = this;
+              var originX = -1 * overlayRect['left'];
+              var originY = -1 * overlayRect['top'];
+
+              this.$$('px-overlay').style.left = originX + 'px';
+              this.$$('px-overlay').style.top = originY + 'px';
+              // it is also no longer fixed, so needs to scroll with window
+              window.addEventListener('scroll',function(){
+                  self.$$('px-overlay').style.top = originY + document.body.scrollTop + 'px';
+                  self.$$('px-overlay').style.left = originX + document.body.scrollLeft + 'px';
+              });
             }
         },
         /**
