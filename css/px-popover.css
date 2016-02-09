@@ -591,18 +591,28 @@ a {
   min-height: 100vh; }
 
 :host {
-  display: block;
+  opacity: 0;
+  visibility: hidden;
+  transition: visibility 0s .10s, opacity .10s ease-out; }
+  :host.fadeFromHidden {
+    transition: opacity .10s ease-out;
+    opacity: 1;
+    visibility: visible; }
+
+#popoverWrapper {
   position: absolute;
-  outline: none;
-  z-index: 1002; }
+  z-index: 1005;
+  margin: 5px; }
 
 #popover {
   outline: none;
   padding: 15px;
   width: 284px;
-  background-color: #e4e4ea;
-  margin: 15px;
-  color: black; }
+  border: 1px solid #d1d0d8;
+  background-color: white;
+  margin: 7px;
+  color: black;
+  box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.15); }
   #popover h6 {
     margin: 0; }
   #popover p {
@@ -610,28 +620,48 @@ a {
 
 div#carat {
   position: absolute;
-  width: 0;
-  height: 0; }
-  div#carat.bottom {
-    top: 8px;
-    border-left: 8px solid transparent;
-    border-right: 8px solid transparent;
-    border-bottom: 8px solid #e4e4ea; }
+  width: 9.899px;
+  height: 9.899px;
+  background-color: white; }
   div#carat.top {
-    top: 0px;
-    border-left: 8px solid transparent;
-    border-right: 8px solid transparent;
-    border-top: 8px solid #e4e4ea; }
+    border: 1px solid transparent;
+    border-color: transparent transparent #d1d0d8 #d1d0d8;
+    -webkit-transform-origin: 50% 50%;
+            transform-origin: 50% 50%;
+    -webkit-transform: rotate(-45deg);
+            transform: rotate(-45deg);
+    box-shadow: 0px -2px 0px white, 2px 0px 0px white, -1px 1px 1px rgba(0, 0, 0, 0.15); }
+  div#carat.bottom {
+    border: 1px solid transparent;
+    border-color: #d1d0d8 transparent transparent #d1d0d8;
+    -webkit-transform-origin: 50% 50%;
+            transform-origin: 50% 50%;
+    -webkit-transform: rotate(45deg);
+            transform: rotate(45deg); }
   div#carat.left {
-    right: 8px;
-    border-top: 8px solid transparent;
-    border-bottom: 8px solid transparent;
-    border-left: 8px solid #e4e4ea; }
+    border: 1px solid transparent;
+    border-color: #d1d0d8 #d1d0d8 transparent transparent;
+    -webkit-transform-origin: 50% 50%;
+            transform-origin: 50% 50%;
+    -webkit-transform: rotate(45deg);
+            transform: rotate(45deg);
+    box-shadow: 0px 2px 0px white, -2px 1px 0px white, 1px 0px 1px rgba(0, 0, 0, 0.15); }
   div#carat.right {
-    left: 8px;
-    border-top: 8px solid transparent;
-    border-bottom: 8px solid transparent;
-    border-right: 8px solid #e4e4ea; }
+    border: 1px solid transparent;
+    border-color: #d1d0d8 transparent transparent #d1d0d8;
+    -webkit-transform-origin: 50% 50%;
+            transform-origin: 50% 50%;
+    -webkit-transform: rotate(-45deg);
+            transform: rotate(-45deg);
+    box-shadow: 0px 2px 0px white, 2px 1px 0px white, -1px 0px 1px rgba(0, 0, 0, 0.15); }
+
+@-moz-document url-prefix() {
+  div#carat.top {
+    box-shadow: -1px 1px 0px rgba(0, 0, 0, 0.15); }
+  div#carat.left {
+    box-shadow: 0px 2px 0px white, 1px 0px 0px rgba(0, 0, 0, 0.15); }
+  div#carat.right {
+    box-shadow: 0px 2px 0px white, -1px 0px 0px rgba(0, 0, 0, 0.15); } }
 
 /*------------------------------------*    #CLEARFIX
 \*------------------------------------*/
@@ -1146,11 +1176,10 @@ div#carat {
             flex: none !important; } }
 
 #popover {
-  background-color: #e4e4ea; }
+  background-color: white; }
   #popover p {
     margin: 0;
     -webkit-hyphens: auto;
-       -moz-hyphens: auto;
         -ms-hyphens: auto;
             hyphens: auto; }
     #popover p:first-child {
