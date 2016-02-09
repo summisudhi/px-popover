@@ -1,4 +1,4 @@
-v1.0.2
+v1.1.0
 ==================
 * added a fix so the overlay displays correctly for transformed elements
 * changed the way positioning was handled to fix transformed elements
