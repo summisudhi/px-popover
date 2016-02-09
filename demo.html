@@ -79,55 +79,90 @@
             </px-popover>
         </div>
         <p></p>
-        <div class="sample-container" style="margin-top:50px;">
-          <p>Transformations on the target do not work:</p>
-          <button id="btnTransform" type="button" name="button" style="transform:translate(250px,50px)">Transformed button</button>
+        <hr style="margin-top:50px;">
+        <div class="sample-container">
+          <p>Transformations on the target work:</p>
+          <button id="btnTransform" type="button" name="button" style="transform:translate(150px,20px)">Transformed button</button>
           <px-popover
               for="btnTransform"
               orientation="bottom"
               popover-title="Translated Popover"
-              popover-body="Transformations currently break positioning.">
+              popover-body="Transformations work.">
           </px-popover>
         </div>
+        <hr style="margin-top:50px;">
         <div class="sample-container" style="transform:translate(250px,50px)">
-          <p>Transformations on the parent really break:</p>
+          <p>Transformations on an ancestor elem also work:</p>
           <button id="btnTransPar" type="button" name="button" >Transformed parent</button>
           <px-popover
               for="btnTransPar"
               orientation="bottom"
               popover-title="Transformed parent Popover"
-              popover-body="Transformations currently break positioning.">
+              popover-body="Transformations work."
+              position="relative" >
           </px-popover>
         </div>
-        <div class="sample-container"  style="position:relative;margin-top:300px;">
-          <p>When Adding a position Relative parent elem:</p>
-          <button id="btnPosRel" type="button" name="button">Position Relative ELem button</button>
-          <px-popover
-              for="btnPosRel"
-              orientation="bottom"
-              popover-title="Translated Popover"
-              popover-body="Transformations currently break positioning.">
-          </px-popover>
+        <hr style="margin-top:50px;margin-bottom:50px;">
+        <div class="sample-container"  style="position:relative;">
+          <p>When Adding a Position Relative ancestor elem, wrap the target and popover in their own position relative element and set the position relative flag in the popover:</p>
+          <span style="position:relative;">
+            <button id="btnUpRel" type="button" name="button">Up</button>
+            <px-popover
+                for="btnUpRel"
+                orientation="top"
+                popover-title="Top Popover"
+                popover-body="Need to wrap the target and popover in a div with relative position."
+                position="relative" >
+            </px-popover>
+          </span>
+          <span style="position:relative;">
+            <button id="btnDownRel" type="button" name="button">Down</button>
+            <px-popover
+                for="btnDownRel"
+                orientation="bottom"
+                popover-title="Bottom Popover"
+                popover-body="Need to wrap the target and popover in a div with relative position"
+                position="relative" >
+            </px-popover>
+          </span>
+
+          <span style="position:relative;">
+            <button id="btnLeftRel" type="button" name="button">Left</button>
+            <px-popover
+                for="btnLeftRel"
+                orientation="left"
+                popover-title="Left Popover"
+                popover-body="Need to wrap the target and popover in a div with relative position"
+                position="relative" >
+            </px-popover>
+          </span>
+
+          <span style="position:relative;">
+            <button id="btnRightRel" type="button" name="button">Right</button>
+            <px-popover
+                for="btnRightRel"
+                orientation="right"
+                popover-title="Right Popover"
+                popover-body="Need to wrap the target and popover in a div with relative position"
+                position="relative" >
+            </px-popover>
+          </span>
         </div>
-        <div class="sample-container"  style="position:fixed;">
-          <p>When Adding a position Static parent elem:</p>
-          <button id="btnPosStatic" type="button" name="button">Position Static ELem button</button>
-          <px-popover
-              for="btnPosStatic"
-              orientation="bottom"
-              popover-title="Static Popover"
-              popover-body="Position Static on parent currently break positioning.">
-          </px-popover>
-        </div>
+
+        <hr style="margin-top:50px;margin-bottom:50px;">
+
         <div class="sample-container" style="margin-top:50px;position:relative;">
-          <p>Transformations on the target with position relative parent do not work:</p>
-          <button id="btnTransform" type="button" name="button" style="transform:translate(250px,50px)">Transformed button</button>
-          <px-popover
-              for="btnTransform"
-              orientation="bottom"
-              popover-title="Translated Popover"
-              popover-body="Transformations currently break positioning.">
-          </px-popover>
+          <p>Transformations on the target with position relative parent do not work. Instead, transform the parent div:</p>
+          <div style="position:relative;">
+            <button id="btnTransform" type="button" name="button" style="transform:translate(250px,50px)">Transformed button</button>
+            <px-popover
+                for="btnTransform"
+                orientation="bottom"
+                popover-title="Translated Popover"
+                popover-body="Transformations on a relative element currently break positioning."
+                position="relative" >
+            </px-popover>
+          </div>
         </div>
     </body>
 </html>
