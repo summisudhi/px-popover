@@ -1,3 +1,18 @@
+v1.1.3 
+=================
+* Updated License
+
+v1.1.2
+==================
+* bug fix for IE and moved some overlay code into overlay component
+
+v1.1.1
+==================
+* bug fix with overlay in a transformed container
+* moved overlay into its own component. Various refactoring to remove oold functionality
+* fixed positioning for transformed and relative positioned elements. Improved docs
+* fixed version
+
 v1.1.0
 ==================
 * added a fix so the overlay displays correctly for transformed elements
